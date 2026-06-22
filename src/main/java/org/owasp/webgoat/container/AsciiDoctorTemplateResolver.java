@@ -43,6 +43,7 @@ public class AsciiDoctorTemplateResolver extends FileTemplateResolver {
 
   private static final Asciidoctor asciidoctor = create();
   private static final String PREFIX = "doc:";
+  private static final String CLASSPATH_PREFIX = "classpath:/";
 
   private final Language language;
   private final ResourceLoader resourceLoader;
@@ -86,13 +87,13 @@ public class AsciiDoctorTemplateResolver extends FileTemplateResolver {
     String computedResourceName =
         computeResourceName(templateName, language.getLocale().getLanguage());
     if (resourceLoader
-        .getResource("classpath:/" + computedResourceName)
-        .isReadable() /*isFile()*/) {
+       .getResource(CLASSPATH_PREFIX + computedResourceName)
+       .isReadable() /*isFile()*/) {
       log.debug("localized file exists");
-      return resourceLoader.getResource("classpath:/" + computedResourceName).getInputStream();
+      return resourceLoader.getResource(CLASSPATH_PREFIX + computedResourceName).getInputStream();
     } else {
       log.debug("using english template");
-      return resourceLoader.getResource("classpath:/" + templateName).getInputStream();
+      return resourceLoader.getResource(CLASSPATH_PREFIX + templateName).getInputStream();
     }
   }
 
@@ -106,7 +107,7 @@ public class AsciiDoctorTemplateResolver extends FileTemplateResolver {
     log.debug("computed local file name: {}", computedResourceName);
     log.debug(
         "file exists: {}",
-        resourceLoader.getResource("classpath:/" + computedResourceName).isReadable());
+        resourceLoader.getResource(CLASSPATH_PREFIX + computedResourceName).isReadable());
     return computedResourceName;
   }
 
@@ -116,11 +117,11 @@ public class AsciiDoctorTemplateResolver extends FileTemplateResolver {
         .attributes(
             Attributes.builder()
                 .attribute("source-highlighter", "coderay")
-                .attribute("backend", "xhtml")
-                .attribute("lang", determineLanguage())
-                .attribute("icons", org.asciidoctor.Attributes.FONT_ICONS)
-                .build())
-        .build();
+               .attribute("backend", "xhtml")
+               .attribute("lang", determineLanguage())
+               .attribute("icons", org.asciidoctor.Attributes.FONT_ICONS)
+               .build())
+       .build();
   }
 
   private String determineLanguage() {
@@ -130,12 +131,12 @@ public class AsciiDoctorTemplateResolver extends FileTemplateResolver {
     Locale browserLocale =
         (Locale)
             request.getSession().getAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME);
-    if (null != browserLocale) {
+    if (null!= browserLocale) {
       log.debug("browser locale {}", browserLocale);
       return browserLocale.getLanguage();
     } else {
       String langHeader = request.getHeader(HttpHeaders.ACCEPT_LANGUAGE);
-      if (null != langHeader) {
+      if (null!= langHeader) {
         log.debug("browser locale {}", langHeader);
         return langHeader.substring(0, 2);
       } else {
