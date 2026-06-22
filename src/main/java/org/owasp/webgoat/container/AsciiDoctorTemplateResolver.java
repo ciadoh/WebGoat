@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright © 2016 WebGoat authors
+ * SPDX-FileCopyrightText: Copyright 2016 WebGoat authors
  * SPDX-License-Identifier: GPL-2.0-or-later
  */
 package org.owasp.webgoat.container;
@@ -86,13 +86,13 @@ public class AsciiDoctorTemplateResolver extends FileTemplateResolver {
     String computedResourceName =
         computeResourceName(templateName, language.getLocale().getLanguage());
     if (resourceLoader
-        .getResource("classpath:/" + computedResourceName)
-        .isReadable() /*isFile()*/) {
+        .getResource(computedResourceName)
+        .isReadable()) {
       log.debug("localized file exists");
-      return resourceLoader.getResource("classpath:/" + computedResourceName).getInputStream();
+      return resourceLoader.getResource(computedResourceName).getInputStream();
     } else {
       log.debug("using english template");
-      return resourceLoader.getResource("classpath:/" + templateName).getInputStream();
+      return resourceLoader.getResource(templateName).getInputStream();
     }
   }
 
@@ -106,7 +106,7 @@ public class AsciiDoctorTemplateResolver extends FileTemplateResolver {
     log.debug("computed local file name: {}", computedResourceName);
     log.debug(
         "file exists: {}",
-        resourceLoader.getResource("classpath:/" + computedResourceName).isReadable());
+        resourceLoader.getResource(computedResourceName).isReadable());
     return computedResourceName;
   }
 
