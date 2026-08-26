@@ -20,6 +20,7 @@ public class AsciiDoctorTemplateResolver extends TemplateResolver {
     private static final String TEMPLATE_PATH = CLASSPATH_PREFIX + "templates/";
     private static final String THEME_PATH = CLASSPATH_PREFIX + "theme.yml";
     private static final String FONTS_PATH = CLASSPATH_PREFIX + "fonts.css";
+    private static final String IMAGES_PATH = CLASSPATH_PREFIX + "images/";
 
     public AsciiDoctorTemplateResolver() {
         setPrefix(TEMPLATE_PATH);
@@ -28,7 +29,7 @@ public class AsciiDoctorTemplateResolver extends TemplateResolver {
 
         Asciidoctor asciidoctor = Asciidoctor.Factory.create();
         AttributesBuilder attributes = AttributesBuilder.attributes();
-        attributes.attribute("imagesdir", CLASSPATH_PREFIX + "images/");
+        attributes.attribute("imagesdir", IMAGES_PATH);
         attributes.attribute("stylesheet", FONTS_PATH);
         Resource themeResource = new ClassPathResource(THEME_PATH);
         try {
@@ -40,8 +41,8 @@ public class AsciiDoctorTemplateResolver extends TemplateResolver {
 
         OptionsBuilder options = OptionsBuilder.options()
                 .backend("html5")
-               .safe(SafeMode.SERVER)
-               .attributes(attributes.asMap());
+              .safe(SafeMode.SERVER)
+              .attributes(attributes.asMap());
 
         setAsciidoctor(asciidoctor);
         setAsciidoctorOptions(options);
