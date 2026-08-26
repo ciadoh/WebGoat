@@ -46,7 +46,7 @@ import org.thymeleaf.templateresource.StringTemplateResource;
 @Slf4j
 public class MvcConfiguration implements WebMvcConfigurer {
 
-  private static final String UTF8 = "UTF-8";
+  private static final String UTF8 = StandardCharsets.UTF_8.name();
 
   private final LessonResourceScanner lessonScanner;
 
@@ -61,7 +61,7 @@ public class MvcConfiguration implements WebMvcConfigurer {
   public ViewResolver viewResolver(SpringTemplateEngine thymeleafTemplateEngine) {
     ThymeleafViewResolver resolver = new ThymeleafViewResolver();
     resolver.setTemplateEngine(thymeleafTemplateEngine);
-    resolver.setCharacterEncoding(StandardCharsets.UTF_8.displayName());
+    resolver.setCharacterEncoding(UTF8);
     return resolver;
   }
 
@@ -144,106 +144,8 @@ public class MvcConfiguration implements WebMvcConfigurer {
         Set.of(
             lessonTemplateResolver,
             asciiDoctorTemplateResolver,
-            lessonThymeleafTemplateResolver,
-            springThymeleafTemplateResolver));
+            springThymeleafTemplateResolver,
+            lessonThymeleafTemplateResolver));
     return engine;
-  }
-
-  @Override
-  public void addResourceHandlers(ResourceHandlerRegistry registry) {
-    // WebGoat internal
-    registry.addResourceHandler("/css/**").addResourceLocations("classpath:/webgoat/static/css/");
-    registry.addResourceHandler("/js/**").addResourceLocations("classpath:/webgoat/static/js/");
-    registry
-        .addResourceHandler("/plugins/**")
-        .addResourceLocations("classpath:/webgoat/static/plugins/");
-    registry
-        .addResourceHandler("/fonts/**")
-        .addResourceLocations("classpath:/webgoat/static/fonts/");
-
-    // WebGoat lessons
-    registry
-        .addResourceHandler("/images/**")
-        .addResourceLocations(
-            lessonScanner.applyPattern("classpath:/lessons/%s/images/").toArray(String[]::new));
-    registry
-        .addResourceHandler("/lesson_js/**")
-        .addResourceLocations(
-            lessonScanner.applyPattern("classpath:/lessons/%s/js/").toArray(String[]::new));
-    registry
-        .addResourceHandler("/lesson_css/**")
-        .addResourceLocations(
-            lessonScanner.applyPattern("classpath:/lessons/%s/css/").toArray(String[]::new));
-    registry
-        .addResourceHandler("/lesson_templates/**")
-        .addResourceLocations(
-            lessonScanner.applyPattern("classpath:/lessons/%s/templates/").toArray(String[]::new));
-    registry
-        .addResourceHandler("/video/**")
-        .addResourceLocations(
-            lessonScanner.applyPattern("classpath:/lessons/%s/video/").toArray(String[]::new));
-  }
-
-  @Bean
-  public PluginMessages pluginMessages(
-      Messages messages, Language language, ResourcePatternResolver resourcePatternResolver) {
-    PluginMessages pluginMessages = new PluginMessages(messages, language, resourcePatternResolver);
-    pluginMessages.setDefaultEncoding("UTF-8");
-    pluginMessages.setBasenames("i18n/WebGoatLabels");
-    pluginMessages.setFallbackToSystemLocale(false);
-    return pluginMessages;
-  }
-
-  @Bean
-  public Language language(LocaleResolver localeResolver) {
-    return new Language(localeResolver);
-  }
-
-  @Bean
-  public LocaleResolver localeResolver() {
-    SessionLocaleResolver localeResolver = new SessionLocaleResolver();
-    return localeResolver;
-  }
-
-  @Bean
-  public LocaleChangeInterceptor localeChangeInterceptor() {
-    LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
-    lci.setParamName("lang");
-    return lci;
-  }
-
-  @Override
-  public void addInterceptors(InterceptorRegistry registry) {
-    registry.addInterceptor(localeChangeInterceptor());
-    registry.addInterceptor(new UserInterceptor());
-  }
-
-  @Bean
-  public Messages messageSource(Language language) {
-    Messages messages = new Messages(language);
-    messages.setDefaultEncoding("UTF-8");
-    messages.setBasename("classpath:i18n/messages");
-    messages.setFallbackToSystemLocale(false);
-    return messages;
-  }
-
-  @Bean
-  public LabelDebugger labelDebugger() {
-    return new LabelDebugger();
-  }
-
-  /**
-   * Spring Boot 4 uses Jackson 3 (tools.jackson) for the HTTP layer. A few lessons inject a Jackson
-   * 2 {@link ObjectMapper} directly; provide one here so those injection points keep resolving. It
-   * mirrors the {@code spring.jackson.serialization.*} settings that the auto-configured Jackson 2
-   * mapper used to apply and registers the JSR-310 module so {@link java.time} types still
-   * serialize.
-   */
-  @Bean
-  public ObjectMapper objectMapper() {
-    return new ObjectMapper()
-        .findAndRegisterModules()
-        .enable(SerializationFeature.INDENT_OUTPUT)
-        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
   }
 }
