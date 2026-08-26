@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright © 2016 WebGoat authors
+ * SPDX-FileCopyrightText: Copyright 2016 WebGoat authors
  * SPDX-License-Identifier: GPL-2.0-or-later
  */
 package org.owasp.webgoat.container;
@@ -50,10 +50,7 @@ public class LessonTemplateResolver extends FileTemplateResolver {
       resource = loadAndCache(templateName);
     }
 
-    if (resource == null) {
-      return new StringTemplateResource("Unable to find lesson HTML: %s".formatted(templateName));
-    }
-    return new StringTemplateResource(new String(resource, StandardCharsets.UTF_8));
+    return resource != null ? new StringTemplateResource(new String(resource, StandardCharsets.UTF_8)) : new StringTemplateResource("Unable to find lesson HTML: " + templateName);
   }
 
   private byte[] loadAndCache(String templateName) {
