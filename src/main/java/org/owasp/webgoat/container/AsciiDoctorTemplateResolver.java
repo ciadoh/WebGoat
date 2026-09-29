@@ -36,7 +36,7 @@ public class AsciiDoctorTemplateResolver extends TemplateResolver {
             String themeContent = StreamUtils.copyToString(themeResource.getInputStream(), StandardCharsets.UTF_8);
             attributes.attribute("theme", themeContent);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to load theme", e);
+            throw new ThemeLoadException("Failed to load theme", e);
         }
 
         OptionsBuilder options = OptionsBuilder.options()
@@ -46,5 +46,11 @@ public class AsciiDoctorTemplateResolver extends TemplateResolver {
 
         setAsciidoctor(asciidoctor);
         setAsciidoctorOptions(options);
+    }
+
+    public static class ThemeLoadException extends RuntimeException {
+        public ThemeLoadException(String message, Throwable cause) {
+            super(message, cause);
+        }
     }
 }
